@@ -20,7 +20,8 @@ Mellow 3.5
 
 Iris 1.11.7
 
-Voxy 0.2.20-beta The modified shader worked in my test. Not all mod combinations / cloud styles were tested. If there is any issues found please let me know.
+Voxy 0.2.20-beta
+The modified shader worked in my test. Not all mod combinations / cloud styles were tested. If there is any issues found please let me know.
 
 IIMPORTANT
 
