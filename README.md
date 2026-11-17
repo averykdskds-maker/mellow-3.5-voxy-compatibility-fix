@@ -1,54 +1,38 @@
-What caused the bug?
+# Mellow 3.5 Voxy compatibility fix
 
-Mellow was registering the vanilla Minecraft cloud texture, even if it wasn't required based on the cloud style selected. Iris will load the textures lazily, but this combined with Voxy can cause an error in Minecraft 26.3. Error: IllegalStateException: Close the current render pass first.
+This is the small fix I made for a rendering error I was getting with Mellow 3.5, Iris and Voxy on Minecraft 26.3.
 
-What I changed
+## What was going wrong
 
-I edited the shaders/shaders.properties file and changed to only register the two vanilla cloud texture references when CLOUD_STYLE == 3.
+Mellow was registering Minecraft's vanilla cloud texture even when the selected cloud style did not use it. Iris loads textures lazily, and with Voxy this could trigger:
 
-```properties
-#if CLOUD_STYLE == 3
-texture.deferred.colortex3=minecraft:textures/environment/clouds.png
-texture.gbuffers.colortex8=minecraft:textures/environment/clouds.png
-#endif
+`IllegalStateException: Close the current render pass first.`
+
+## What I changed
+
+I changed `shaders/shaders.properties` so the two vanilla cloud texture references are only registered when `CLOUD_STYLE == 3`.
+
+Cloud Style 3 still gets the textures it needs. Other cloud styles no longer register textures they do not use. I left the SMAA texture registrations and the rest of the shader alone.
+
+## The source change
+
+The change is in [`patches/voxy-cloud-texture-registration.patch`](patches/voxy-cloud-texture-registration.patch).
+
+It applies to the Mellow source at commit `0f7f5947b7790d10ee27263fb8e814ac7534910a`. From the root of that Mellow source checkout, check and apply it with:
+
+```bash
+git apply --check path/to/voxy-cloud-texture-registration.patch
+git apply path/to/voxy-cloud-texture-registration.patch
 ```
 
-This means Cloud Style 3 will still get its required cloud textures, whilst other cloud styles won't register textures they don't need. No cloud effects or shader features have been removed.
+Replace `path/to/` with wherever you saved the patch. The patch only changes `shaders/shaders.properties`.
 
-## Source code change
+## Testing
 
-The source-level change is now provided as a Git patch, rather than only as a compiled shader archive:
+I tested it with Minecraft 26.3, Mellow 3.5, Iris 1.11.7 and Voxy 0.2.20-beta. The test details and logs are in [`docs/TESTING.md`](docs/TESTING.md).
 
-- [View the Voxy cloud texture registration patch](patches/voxy-cloud-texture-registration.patch)
+## Credits and scope
 
-The patch modifies only `shaders/shaders.properties`. It adds conditional registration for the two vanilla cloud texture references and leaves the SMAA texture registrations unchanged. It is based on Mellow source commit `0f7f5947b7790d10ee27263fb8e814ac7534910a`.
+This is an unofficial fix I made. It is not an official Mellow release, and I am not affiliated with the original Mellow author.
 
-Testing
-
-Tested on:
-
-Minecraft 26.3
-
-Mellow 3.5
-
-Iris 1.11.7
-
-Voxy 0.2.20-beta
-
-The modified shader worked in my test. Not all mod combinations / cloud styles were tested. If there are any issues found, please let me know.
-
-## Important
-
-This is a small unofficial fix I created on my own. This isn't an official Mellow release and isn't related to the original Mellow author.
-
-Mellow was originally created by TheCMK. Please keep the original licensing and credits when redistributing. See included licence files for more info.
-
-Test log: https://mclo.gs/XOWix2E
-
-Screenshot: https://sshot.online/f/kGQ8EGt.png
-
-### Without Voxy and using the original shader
-
-Test log: https://mclo.gs/JJNQ5U6
-
-Screenshot: https://sshot.online/f/ZhsX6hn.png
+Mellow was created by TheCMK. This repository contains my small patch and its test notes, not a copy of the full shader pack. Keep the original Mellow credits and follow its licence when using or redistributing Mellow.
