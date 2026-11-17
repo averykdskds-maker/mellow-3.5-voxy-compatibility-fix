@@ -1,0 +1,4 @@
+# Local output from the Mellow release script
+release-temp/
+build.log
+Mellow v*.zip
