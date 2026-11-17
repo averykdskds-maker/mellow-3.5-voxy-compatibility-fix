@@ -1,4 +1,7 @@
 # Local output from the Mellow release script
-release-temp/
-build.log
-Mellow v*.zip
+/release-temp/
+/build.log
+
+# Keep release ZIPs attached to GitHub Releases, not committed to the repository
+/Mellow*.zip
+/voxymellowcompat-proof.mp4
