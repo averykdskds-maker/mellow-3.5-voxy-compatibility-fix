@@ -1,42 +1,60 @@
-What caused the bug?
+# Mellow 3.5 — Voxy compatibility fix
 
-Mellow was registering the vanilla Minecraft cloud texture, even if it wasn't required based on the cloud style selected. Iris will load the textures lazily, but this combined with Voxy can cause an error in Minecraft 26.3. Error: IllegalStateException: Close the current render pass first.
+This is a small fix I made for a rendering error with Mellow 3.5, Iris and Voxy on Minecraft 26.3.
 
-What I changed
+## What caused the bug?
 
-I edited the shaders/shaders.properties file and changed to only register the two vanilla cloud texture references when CLOUD_STYLE == 3.
+Mellow was registering Minecraft's vanilla cloud texture even when the selected cloud style did not need it.
 
-#if CLOUD_STYLE == 3 texture.deferred.colortex3=minecraft:textures/environment/clouds.png texture.gbuffers.colortex8=minecraft:textures/environment/clouds.png #endif
+Iris loads textures lazily. When this happened alongside Voxy, it could trigger this error:
 
-This means Cloud Style 3 will still get its required cloud textures, whilst other cloud styles won't register textures they don't need. No cloud effects or shader features have been removed.
+```text
+IllegalStateException: Close the current render pass first.
+```
 
-Testing
+## What I changed
 
-Tested on:
+I edited `shaders/shaders.properties` so the two vanilla cloud texture references are only registered when `CLOUD_STYLE == 3`.
 
-Minecraft 26.3
+```properties
+#if CLOUD_STYLE == 3
+texture.deferred.colortex3=minecraft:textures/environment/clouds.png
+#endif
 
-Mellow 3.5
+#if CLOUD_STYLE == 3
+texture.gbuffers.colortex8=minecraft:textures/environment/clouds.png
+#endif
+```
 
-Iris 1.11.7
+## What this changes
 
-Voxy 0.2.20-beta
-The modified shader worked in my test. Not all mod combinations / cloud styles were tested. If there is any issues found please let me know.
+Cloud Style 3 still gets the cloud textures it needs. Other cloud styles no longer register textures they do not use.
 
-IIMPORTANT
+I left the SMAA texture registrations alone, and I did not remove any cloud effects or shader features.
 
-This is a small unofficial fix I created on my own. This isn't an official Mellow release and isn't related to the original Mellow author.
+## Testing
 
-Mellow was originally created by TheCMK. Please keep the original licensing and credits when redistributing. See included licence files for more info.
+I tested the modified shader with:
 
-Test log: https://mclo.gs/XOWix2E
+- **Minecraft:** 26.3
+- **Mellow:** 3.5
+- **Iris:** 1.11.7
+- **Voxy:** 0.2.20-beta
 
-Screenshot: https://sshot.online/f/kGQ8EGt.png
+The modified shader worked in my test. I have not tested every possible mod combination or cloud style, so I cannot claim that every setup is covered.
 
+## Credits and disclaimer
 
+This is an unofficial fix I made myself. It is not an official Mellow release, and I am not affiliated with the original Mellow author.
 
-W/out Voxy and using original shader:
+Mellow was originally created by **TheCMK**. Please keep the original credits and follow the included licence when using or redistributing Mellow.
 
-Test log: https://mclo.gs/JJNQ5U6
+## Test evidence
 
-Screenshot: https://sshot.online/f/ZhsX6hn.png
+- [Test log — patched shader with Voxy](https://mclo.gs/XOWix2E)
+- [Screenshot — patched shader with Voxy](https://sshot.online/f/kGQ8EGt.png)
+
+### Comparison: original shader without Voxy
+
+- [Test log — original shader without Voxy](https://mclo.gs/JJNQ5U6)
+- [Screenshot — original shader without Voxy](https://sshot.online/f/ZhsX6hn.png)
