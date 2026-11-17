@@ -1,0 +1,19 @@
+diff --git a/shaders/shaders.properties b/shaders/shaders.properties
+index f744de9..277fe15 100644
+--- a/shaders/shaders.properties
++++ b/shaders/shaders.properties
+@@ -49,10 +49,14 @@ particles.ordering=mixed
+ texture.gbuffers.noisetex=/img/cloud_noise+normal.png
+ texture.deferred.noisetex=/img/cloud_noise+normal.png
+ 
++#if CLOUD_STYLE == 3
+ texture.deferred.colortex3=minecraft:textures/environment/clouds.png
++#endif
+ texture.composite.colortex3=/img/smaaArea.png
+ 
++#if CLOUD_STYLE == 3
+ texture.gbuffers.colortex8=minecraft:textures/environment/clouds.png
++#endif
+ texture.composite.gaux2=/img/smaaSearch.png
+ 
+ texture.gbuffers.gaux3=/img/worley_perlin.bin TEXTURE_3D R8 64 64 64 RED UNSIGNED_BYTE
