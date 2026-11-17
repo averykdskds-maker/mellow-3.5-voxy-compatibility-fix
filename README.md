@@ -1,18 +1,43 @@
-# Mellow 3.5 Voxy compatibility fix
+# Mellow 3.5 — Voxy compatibility fix
 
-This is the small fix I made for a rendering error I was getting with Mellow 3.5, Iris and Voxy on Minecraft 26.3.
+This is a small fix I made for a rendering error with Mellow 3.5, Iris and Voxy on Minecraft 26.3.
 
-## What was going wrong
+## What caused the bug?
 
-Mellow was registering Minecraft's vanilla cloud texture even when the selected cloud style did not use it. Iris loads textures lazily, and with Voxy this could trigger:
+Mellow was registering Minecraft's vanilla cloud texture even when the selected cloud style did not use it.
 
-`IllegalStateException: Close the current render pass first.`
+Iris loads textures lazily. When this happened alongside Voxy, it could trigger:
+
+```text
+IllegalStateException: Close the current render pass first.
+```
 
 ## What I changed
 
-I changed `shaders/shaders.properties` so the two vanilla cloud texture references are only registered when `CLOUD_STYLE == 3`.
+I changed `shaders/shaders.properties` so the two vanilla cloud texture references are only registered when `CLOUD_STYLE == 0`.
 
-Cloud Style 3 still gets the textures it needs. Other cloud styles no longer register textures they do not use. I left the SMAA texture registrations and the rest of the shader alone.
+```properties
+#if CLOUD_STYLE == 0
+texture.deferred.colortex3=minecraft:textures/environment/clouds.png
+#endif
+
+#if CLOUD_STYLE == 0
+texture.gbuffers.colortex8=minecraft:textures/environment/clouds.png
+#endif
+```
+
+I checked the Mellow 3.5 source and confirmed the cloud-style values:
+
+| Value | Cloud style |
+|---:|---|
+| `0` | Vanilla |
+| `1` | Flat |
+| `2` | Volumetric |
+| `3` | Blocky |
+
+Mellow disables Minecraft's vanilla cloud pass whenever the selected style is not Vanilla. The vanilla cloud texture registrations should therefore be kept for style `0`, not style `3`.
+
+The SMAA texture registrations are left unchanged. No cloud effects or shader features are removed.
 
 ## The source change
 
@@ -25,11 +50,13 @@ git apply --check path/to/voxy-cloud-texture-registration.patch
 git apply path/to/voxy-cloud-texture-registration.patch
 ```
 
-Replace `path/to/` with wherever you saved the patch. The patch only changes `shaders/shaders.properties`.
+Replace `path/to/` with wherever you saved the patch. It only changes `shaders/shaders.properties`.
 
 ## Testing
 
-I tested it with Minecraft 26.3, Mellow 3.5, Iris 1.11.7 and Voxy 0.2.20-beta. The test details and logs are in [`docs/TESTING.md`](docs/TESTING.md).
+The earlier test build used the original `CLOUD_STYLE == 3` condition. The corrected `CLOUD_STYLE == 0` version still needs to be rebuilt and tested in Minecraft before I can say this revised fix is confirmed.
+
+The test setup and previous evidence are listed in [`docs/TESTING.md`](docs/TESTING.md).
 
 ## Credits and scope
 
