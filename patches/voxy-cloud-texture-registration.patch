@@ -6,12 +6,12 @@ index f744de9..277fe15 100644
  texture.gbuffers.noisetex=/img/cloud_noise+normal.png
  texture.deferred.noisetex=/img/cloud_noise+normal.png
  
-+#if CLOUD_STYLE == 3
++#if CLOUD_STYLE == 0
  texture.deferred.colortex3=minecraft:textures/environment/clouds.png
 +#endif
  texture.composite.colortex3=/img/smaaArea.png
  
-+#if CLOUD_STYLE == 3
++#if CLOUD_STYLE == 0
  texture.gbuffers.colortex8=minecraft:textures/environment/clouds.png
 +#endif
  texture.composite.gaux2=/img/smaaSearch.png
